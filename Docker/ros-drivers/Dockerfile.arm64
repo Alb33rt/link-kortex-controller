@@ -1,0 +1,37 @@
+FROM arm64v8/ros:humble
+
+ARG WORKSPACE=/workspace
+ARG ROS_DISTRO=humble
+ARG COLCON_WS=/workspace/ros2_ws
+
+SHELL ["/bin/bash", "-c"]
+
+# TODO: Add kortex3 setup instructions
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+    wget \
+    python3-vcstool \ 
+    python3-rosdep \
+    python3-colcon-clean \
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-humble-gz-ros2-control \
+    ros-humble-gz-ros2-control-demos \
+    ros-humble-gripper-controllers \
+    && rm -rf /tmp/*
+
+COPY ./setup_kortex.sh /tmp/setup_kortex.sh
+RUN chmod +x /tmp/setup_kortex.sh && /tmp/setup_kortex.sh
+
+# Copy current repository into the container for use
+WORKDIR ${WORKSPACE}
+COPY . ${WORKSPACE}
+
+WORKDIR ${COLCON_WS}
+# RUN vcs import src --skip-existing --input ${COLCON_WS}/src/ros2_kortex3.${ROS_DISTRO}.repos
+
+# TODO: Enter the correct ROS2 workspace
+# RUN rosdep update && \
+#     rosdep install --ignore-src --from-paths src -r -y
+
+RUN echo "source $COLCON_WS/install/setup.bash" >> ~/.bashrc
+
+ENTRYPOINT [ "/bin/sh", "-c", "bash" ]
