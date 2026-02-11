@@ -30,9 +30,10 @@ RUN vcs import src --skip-existing --input src/ros2_kortex3.$ROS_DISTRO.repos
 RUN rosdep update && \
     rosdep install --ignore-src --from-paths src -r -y
 
-RUN source "/opt/ros/$ROS_DISTRO/setup.bash" \
-    && colcon build --packages-skip cartesian_controller_simulation cartesian_controller_tests --cmake-args -DCMAKE_BUILD_TYPE=Release
+# RUN source "/opt/ros/$ROS_DISTRO/setup.bash" \
+#     && colcon build --packages-skip cartesian_controller_simulation cartesian_controller_tests --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+RUN source "/opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 RUN echo "source $COLCON_WS/install/setup.bash" >> ~/.bashrc
 
-ENTRYPOINT [ "/bin/sh", "-c", "bash"]
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
